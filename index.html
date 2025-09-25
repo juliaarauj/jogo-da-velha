@@ -1,0 +1,136 @@
+
+<html lang="pt-BR">  
+  <head>  
+      <title>Jogo da Velha | Cyber Grid</title>  
+      <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>  
+      /* Estilo Global para o corpo */
+      body {
+          background-color: #1a1a2e; /* Fundo bem escuro, quase preto (espaço/cyber) */
+          color: #e94560; /* Cor de destaque neon */
+          font-family: 'Orbitron', sans-serif; /* Fonte futurista/digital */
+          text-align: center;
+          padding: 20px;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+      }
+
+      /* Estilo para o Título com Efeito Neon */
+      h1 {
+          color: #66ff00; /* Neon Verde/Lima */
+          font-size: 3.5rem;
+          text-shadow: 0 0 5px #66ff00, 0 0 10px #66ff00, 0 0 20px #00ff00; /* Efeito Neon */
+          margin-bottom: 20px;
+          letter-spacing: 5px; /* Espaçamento para visual high-tech */
+      }
+      
+      /* Estilo para as Células (Casas) */
+      .casa{  
+          background: #2b2b45; /* Cor de metal escuro/interface */
+          display: flex; 
+          align-items: center;  
+          justify-content: center;  
+          font-size: 6rem; /* Gigante, como um placar */
+          cursor: pointer;
+          border: 1px solid #4a4e69; /* Borda fina para separar a "grade" */
+          transition: background-color 0.1s, transform 0.1s;
+          user-select: none;
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+          border-radius: 5px;
+      }
+      /* Efeito ao passar o mouse: "Ligado" */
+      .casa:hover {
+          background-color: #3f3f6e; /* Fica mais claro ao ser ativado */
+          transform: scale(1.02);
+      }
+      
+      /* Estilo para o Tabuleiro (Grid) */
+      .tabuleiro{  
+          background: #0f0f1a; /* Fundo da grade, bem escuro */
+          display: grid;  
+          grid-template-columns: repeat(3,130px); /* Aumentei mais ainda para impacto */
+          grid-template-rows: repeat(3, 130px); 
+          gap: 10px; /* Aumentei o espaço entre as células */
+          padding: 15px; /* Padding grande para a borda da 'placa-mãe' */
+          margin: 20px auto;  
+          width: max-content;
+          border-radius: 10px;
+          border: 3px solid #3f3f6e; /* Borda da estrutura */
+          box-shadow: 0 0 15px rgba(102, 255, 0, 0.5); /* Brilho verde de energia */
+      }
+
+      /* Cores temáticas NEON para os jogadores (X e O) */
+      
+      /* Se X fosse clicado, ele teria que ter a classe .x-move no JS para funcionar
+         como no medieval, faremos uma cor básica para as casas pares/ímpares,
+         mas a cor final deve vir do JS. */
+      
+      .casa:nth-child(odd) {
+          color: #ff00ff; /* Neon Roxo (Magenta) */
+          text-shadow: 0 0 5px #ff00ff;
+      }
+      .casa:nth-child(even) {
+          color: #00ffff; /* Neon Ciano (Aqua) */
+          text-shadow: 0 0 5px #00ffff;
+      }
+      
+      /* Adicionando classes específicas para quando o JS marcar a casa */
+      /* No seu JS, você precisaria adicionar:
+         casa.classList.add(jogador.toLowerCase() === "x" ? "x-move" : "o-move");
+         para usar estas classes. */
+      /* .x-move { color: #ff00ff; text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff !important; } */
+      /* .o-move { color: #00ffff; text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff !important; } */
+
+           </style>  
+         </head>  
+       <body>  
+          <h1>[ C Y B E R G R I D ]</h1>  
+         <div class="tabuleiro">  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+         <div class="casa"></div>  
+
+
+         </div>  
+         <script>  
+          const casas = document.querySelectorAll(".casa");  
+          let jogador ="x";  
+
+          const combinacoes = [  
+            [0,1,2],[3,4,5],[6,7,8,],  
+            [0,3,6],[1,4,7],[2,5,8],  
+            [0,4,8],[2,4,6]  
+          ]  
+            
+          casas.forEach(casa =>{  
+              casa.addEventListener('click', clique)  
+          })  
+
+
+          function clique(event){  
+              const casa = event.target;  
+              if(casa.textContent === "") {  
+                  casa.textContent = jogador;
+                  
+                  // Esta linha é mantida para garantir a consistência do código
+                  // Embora as classes .x-move e .o-move não estejam sendo usadas no script original
+                  casa.classList.add(jogador.toLowerCase() === "x" ? "x-move" : "o-move");
+                    
+                  jogador = (jogador === "X") ? "0" : "X";  
+              }  
+          }  
+
+        
+            
+         </script>  
+  </body>  
+  </html>
