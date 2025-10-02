@@ -120,14 +120,32 @@
               const casa = event.target;  
               if(casa.textContent === "") {  
                   casa.textContent = jogador;
-                  
+                  if(checarVencedor()){
+                    alert("Paearbens!! O jogador" + jogador + "venceu!!")
+                  } else {
+                    jogador = (jogador === "X") ? "0" : "X"; 
+                  }
                   // Esta linha é mantida para garantir a consistência do código
                   // Embora as classes .x-move e .o-move não estejam sendo usadas no script original
                   casa.classList.add(jogador.toLowerCase() === "x" ? "x-move" : "o-move");
                     
-                  jogador = (jogador === "X") ? "0" : "X";  
+                   
               }  
           }  
+
+          function checarVencedor(){
+            for(let i = 0; i < combinacoes.length; i++){
+                const [a,b,c] = combinacoes[i];
+                if (casas[a].textContent === jogador&&
+                    casas[b].textContent === jogador&&
+                    casas[c].textContent === jogador){
+                        return true;
+                }else {
+                    return false;
+                }
+            }
+            
+          }
 
         
             
