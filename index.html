@@ -1,10 +1,11 @@
 
+<!DOCTYPE html>
 <html lang="pt-BR">  
 <head>  
+    <meta charset="UTF-8">
     <title>Jogo da Velha | Cyber Grid</title>  
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>  
-        /* --- ESTILOS MANTIDOS E RESUMIDOS PARA FOCO --- */
         body {
             background-color: #1a1a2e;
             color: #e94560;
@@ -69,6 +70,17 @@
         .o-move {
             color: #00ffff;
             text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+        }
+
+        .vitoria {
+            background-color: #66ff00 !important;
+            box-shadow: 0 0 10px #66ff00, 0 0 20px #66ff00;
+            animation: brilhar 1s infinite alternate;
+        }
+
+        @keyframes brilhar {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
         }
 
         button {
@@ -148,12 +160,21 @@
         }
 
         function checarVencedor() {
-            return combinacoes.some(combinacao => {
+            for (const combinacao of combinacoes) {
                 const [a, b, c] = combinacao;
-                return casas[a].textContent === jogador &&
-                       casas[b].textContent === jogador &&
-                       casas[c].textContent === jogador;
-            });
+                if (
+                    casas[a].textContent === jogador &&
+                    casas[b].textContent === jogador &&
+                    casas[c].textContent === jogador
+                ) {
+                    // Adiciona a classe 'vitoria' nas casas vencedoras
+                    casas[a].classList.add("vitoria");
+                    casas[b].classList.add("vitoria");
+                    casas[c].classList.add("vitoria");
+                    return true;
+                }
+            }
+            return false;
         }
 
         function checarEmpate() {
@@ -167,7 +188,7 @@
         function reiniciar() {
             casas.forEach(casa => {
                 casa.textContent = "";
-                casa.classList.remove("x-move", "o-move");
+                casa.classList.remove("x-move", "o-move", "vitoria");
             });
             jogador = "X";
             jogoEncerrado = false;
