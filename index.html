@@ -138,6 +138,16 @@
     let vitorias = { X: 0, O: 0 };
     let jogoEncerrado = false;
 
+    // Desbloqueia áudio no primeiro clique do usuário para evitar bloqueio pelo navegador
+    window.addEventListener('click', () => {
+      somVitoria.play().then(() => {
+        somVitoria.pause();
+        somVitoria.currentTime = 0;
+      }).catch(() => {
+        // Ignora erros de autoplay bloqueado
+      });
+    }, { once: true });
+
     const combinacoes = [
       [0, 1, 2],
       [3, 4, 5],
