@@ -126,9 +126,8 @@
 
   <button onclick="reiniciar()">🔁 Reiniciar Jogo</button>
 
-  <!-- Áudio de vitória -->
-  <audio id="som-vitoria" src="victory.mp3" preload="auto"></audio>
-
+  <!-- Áudio de vitória personalizado -->
+  <audio id="som-vitoria" src="welcome-to-the-mato-estourado.mp3" preload="auto"></audio>
 
   <script>
     const casas = document.querySelectorAll(".casa");
@@ -139,14 +138,12 @@
     let vitorias = { X: 0, O: 0 };
     let jogoEncerrado = false;
 
-    // Desbloqueia áudio no primeiro clique do usuário para evitar bloqueio pelo navegador
+    // Desbloquear o áudio com o primeiro clique do usuário
     window.addEventListener('click', () => {
       somVitoria.play().then(() => {
         somVitoria.pause();
         somVitoria.currentTime = 0;
-      }).catch(() => {
-        // Ignora erros de autoplay bloqueado
-      });
+      }).catch(() => {});
     }, { once: true });
 
     const combinacoes = [
@@ -171,8 +168,14 @@
       casa.classList.add(jogador === "X" ? "x-move" : "o-move");
 
       if (checarVencedor()) {
-        alert("Parabéns! Jogador " + jogador + " venceu!");
+        // Toca o som antes do alert (para evitar bloqueio)
+        somVitoria.currentTime = 0;
         somVitoria.play();
+
+        setTimeout(() => {
+          alert("Parabéns! Jogador " + jogador + " venceu!");
+        }, 100);
+
         vitorias[jogador]++;
         atualizarPlacar();
         jogoEncerrado = true;
