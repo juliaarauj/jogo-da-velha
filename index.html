@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -127,7 +126,7 @@
   <button onclick="reiniciar()">🔁 Reiniciar Jogo</button>
 
   <!-- Áudio de vitória personalizado -->
-  <audio id="som-vitoria" src="vitoria.mp3" preload="auto"></audio>
+  <audio id="som-vitoria" src="welcome-to-the-mato-estourado.mp3" preload="auto"></audio>
 
   <script>
     const casas = document.querySelectorAll(".casa");
@@ -168,7 +167,7 @@
       casa.classList.add(jogador === "X" ? "x-move" : "o-move");
 
       if (checarVencedor()) {
-        // Toca o som antes do alert (para evitar bloqueio)
+        // Tocar som antes do alert
         somVitoria.currentTime = 0;
         somVitoria.play();
 
@@ -219,7 +218,12 @@
       });
       jogador = "X";
       jogoEncerrado = false;
+
+      // ⏹️ Parar som se estiver tocando
+      somVitoria.pause();
+      somVitoria.currentTime = 0;
     }
   </script>
 </body>
 </html>
+
