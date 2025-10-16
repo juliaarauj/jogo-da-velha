@@ -2,64 +2,92 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Jogo da Velha - Contra CPU</title>
+  <title>Jogo da Velha | Cyber Grid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      background-color: #121212;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
+      background-color: #1a1a2e;
+      color: #e94560;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      margin: 0;
     }
 
     h1 {
-      font-size: 3rem;
       color: #66ff00;
+      font-size: 3.5rem;
+      text-shadow: 0 0 5px #66ff00, 0 0 10px #66ff00, 0 0 20px #00ff00;
+      margin-bottom: 10px;
+    }
+
+    .placar {
+      font-size: 1.5rem;
       margin-bottom: 20px;
+      color: #fff;
     }
 
     .tabuleiro {
+      background: #0f0f1a;
       display: grid;
       grid-template-columns: repeat(3, 130px);
       grid-template-rows: repeat(3, 130px);
       gap: 10px;
-      background-color: #1f1f1f;
-      padding: 10px;
+      padding: 15px;
       border-radius: 10px;
+      border: 3px solid #3f3f6e;
+      box-shadow: 0 0 15px rgba(102, 255, 0, 0.5);
     }
 
     .casa {
-      background-color: #2c2c2c;
-      border: 2px solid #555;
+      background: #2b2b45;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 4rem;
+      font-size: 6rem;
       cursor: pointer;
-      transition: background 0.2s;
+      border: 1px solid #4a4e69;
+      transition: background-color 0.1s, transform 0.1s;
+      user-select: none;
+      border-radius: 5px;
     }
 
     .casa:hover {
-      background-color: #444;
+      background-color: #3f3f6e;
+      transform: scale(1.02);
+    }
+
+    .x-move {
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+    }
+
+    .o-move {
+      color: #00ffff;
+      text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
     }
 
     .vitoria {
       background-color: #66ff00 !important;
-      color: #000 !important;
+      box-shadow: 0 0 10px #66ff00, 0 0 20px #66ff00;
+      animation: brilhar 1s infinite alternate;
     }
 
-    #vencedor {
-      font-size: 2.5rem;
-      margin-top: 20px;
-      color: #00ffff;
+    @keyframes brilhar {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.05);
+      }
     }
 
     button {
-      margin-top: 30px;
+      margin-top: 20px;
       padding: 10px 20px;
       font-size: 1rem;
       background-color: #66ff00;
@@ -77,8 +105,11 @@
   </style>
 </head>
 <body>
+  <h1>[ C Y B E R G R I D ]</h1>
 
-  <h1>Jogo da Velha VS CPU</h1>
+  <div class="placar" id="placar">
+    🟣 Jogador X: 0 | 🟦 Jogador O: 0
+  </div>
 
   <div class="tabuleiro">
     <div class="casa"></div>
@@ -92,92 +123,106 @@
     <div class="casa"></div>
   </div>
 
-  <div id="vencedor"></div>
+  <button onclick="reiniciar()">🔁 Reiniciar Jogo</button>
 
-  <button onclick="reiniciar()">🔁 Jogar Novamente</button>
+  <!-- Áudio de vitória personalizado -->
+  <audio id="som-vitoria" src="vitoria.mp3" preload="auto"></audio>
 
   <script>
-    const casas = document.querySelectorAll('.casa');
-    const vencedorDiv = document.getElementById('vencedor');
-    let jogador = 'X';
+    const casas = document.querySelectorAll(".casa");
+    const placar = document.getElementById("placar");
+    const somVitoria = document.getElementById("som-vitoria");
+
+    let jogador = "X";
+    let vitorias = { X: 0, O: 0 };
     let jogoEncerrado = false;
 
+    // Desbloquear o áudio com o primeiro clique do usuário
+    window.addEventListener('click', () => {
+      somVitoria.play().then(() => {
+        somVitoria.pause();
+        somVitoria.currentTime = 0;
+      }).catch(() => {});
+    }, { once: true });
+
     const combinacoes = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
     ];
 
-    casas.forEach(casa => casa.addEventListener('click', cliqueCasa));
+    casas.forEach((casa) => casa.addEventListener("click", clique));
 
-    function cliqueCasa(e) {
-      const casa = e.target;
-      const idx = Array.from(casas).indexOf(casa);
+    function clique(event) {
+      const casa = event.target;
+
       if (casa.textContent !== "" || jogoEncerrado) return;
 
-      aplicarJogada(casa, idx, jogador);
+      casa.textContent = jogador;
+      casa.classList.add(jogador === "X" ? "x-move" : "o-move");
 
-      if (!jogoEncerrado && jogador === 'O') {
+      if (checarVencedor()) {
+        // Tocar som antes do alert
+        somVitoria.currentTime = 0;
+        somVitoria.play();
+
         setTimeout(() => {
-          jogadaCPU();
-        }, 400);
-      }
-    }
+          alert("Parabéns! Jogador " + jogador + " venceu!");
+        }, 100);
 
-    function aplicarJogada(casaEl, idx, jog) {
-      casaEl.textContent = jog;
-
-      if (checarVencedor(jog)) {
+        vitorias[jogador]++;
+        atualizarPlacar();
         jogoEncerrado = true;
-        const combinacao = combinacoes.find(c => c.every(i => casas[i].textContent === jog));
-        combinacao.forEach(i => casas[i].classList.add('vitoria'));
-        vencedorDiv.textContent = `🎉 Jogador ${jog} venceu!`;
-        return;
-      }
-
-      if (checarEmpate()) {
+      } else if (checarEmpate()) {
+        alert("Empate! 😐");
         jogoEncerrado = true;
-        vencedorDiv.textContent = "😐 Empate!";
-        return;
+      } else {
+        jogador = jogador === "X" ? "O" : "X";
       }
-
-      jogador = jog === 'X' ? 'O' : 'X';
     }
 
-    function jogadaCPU() {
-      if (jogoEncerrado) return;
-
-      const vazias = Array.from(casas)
-        .map((casa, idx) => casa.textContent === "" ? idx : null)
-        .filter(idx => idx !== null);
-
-      if (vazias.length === 0) return;
-
-      const escolha = vazias[Math.floor(Math.random() * vazias.length)];
-      aplicarJogada(casas[escolha], escolha, jogador);
-    }
-
-    function checarVencedor(jogador) {
-      return combinacoes.some(comb => 
-        comb.every(i => casas[i].textContent === jogador)
-      );
+    function checarVencedor() {
+      for (const combinacao of combinacoes) {
+        const [a, b, c] = combinacao;
+        if (
+          casas[a].textContent === jogador &&
+          casas[b].textContent === jogador &&
+          casas[c].textContent === jogador
+        ) {
+          casas[a].classList.add("vitoria");
+          casas[b].classList.add("vitoria");
+          casas[c].classList.add("vitoria");
+          return true;
+        }
+      }
+      return false;
     }
 
     function checarEmpate() {
-      return Array.from(casas).every(c => c.textContent !== "");
+      return [...casas].every((casa) => casa.textContent !== "");
+    }
+
+    function atualizarPlacar() {
+      placar.textContent = `🟣 Jogador X: ${vitorias.X} | 🟦 Jogador O: ${vitorias.O}`;
     }
 
     function reiniciar() {
-      casas.forEach(c => {
-        c.textContent = '';
-        c.classList.remove('vitoria');
+      casas.forEach((casa) => {
+        casa.textContent = "";
+        casa.classList.remove("x-move", "o-move", "vitoria");
       });
-      jogador = 'X';
+      jogador = "X";
       jogoEncerrado = false;
-      vencedorDiv.textContent = '';
+
+      // ⏹️ Parar som se estiver tocando
+      somVitoria.pause();
+      somVitoria.currentTime = 0;
     }
   </script>
 </body>
 </html>
-
-
